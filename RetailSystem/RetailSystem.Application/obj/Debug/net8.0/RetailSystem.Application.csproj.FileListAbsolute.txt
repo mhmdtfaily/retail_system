@@ -1,0 +1,15 @@
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\bin\Debug\net8.0\RetailSystem.Application.deps.json
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\bin\Debug\net8.0\RetailSystem.Application.dll
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\bin\Debug\net8.0\RetailSystem.Application.pdb
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\bin\Debug\net8.0\RetailSystem.Core.dll
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\bin\Debug\net8.0\RetailSystem.Core.pdb
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\obj\Debug\net8.0\RetailSystem.Application.csproj.AssemblyReference.cache
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\obj\Debug\net8.0\RetailSystem.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\obj\Debug\net8.0\RetailSystem.Application.AssemblyInfoInputs.cache
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\obj\Debug\net8.0\RetailSystem.Application.AssemblyInfo.cs
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\obj\Debug\net8.0\RetailSystem.Application.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\obj\Debug\net8.0\RetailSy.08C98437.Up2Date
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\obj\Debug\net8.0\RetailSystem.Application.dll
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\obj\Debug\net8.0\refint\RetailSystem.Application.dll
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\obj\Debug\net8.0\RetailSystem.Application.pdb
+C:\Users\Lenovo\Desktop\retail_system\RetailSystem\RetailSystem.Application\obj\Debug\net8.0\ref\RetailSystem.Application.dll

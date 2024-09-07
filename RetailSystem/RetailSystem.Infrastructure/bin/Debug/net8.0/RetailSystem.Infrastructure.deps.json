@@ -1,0 +1,56 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "RetailSystem.Infrastructure/1.0.0": {
+        "dependencies": {
+          "RetailSystem.Application": "1.0.0",
+          "RetailSystem.Core": "1.0.0"
+        },
+        "runtime": {
+          "RetailSystem.Infrastructure.dll": {}
+        }
+      },
+      "RetailSystem.Application/1.0.0": {
+        "dependencies": {
+          "RetailSystem.Core": "1.0.0"
+        },
+        "runtime": {
+          "RetailSystem.Application.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "RetailSystem.Core/1.0.0": {
+        "runtime": {
+          "RetailSystem.Core.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "RetailSystem.Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "RetailSystem.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "RetailSystem.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
