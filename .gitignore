@@ -3,3 +3,6 @@
 # Ignore all obj directories
 **/obj/
 .vs/
+
+#Ignore migration
+RetailSystem/RetailSystem.Infrastructure/Migrations/
