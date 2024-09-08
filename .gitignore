@@ -1,13 +1,13 @@
 # Build results
 [Dd]ebug/
-[Dd]ebugPublic/
 [Rr]eleases/
 [Rr]eleasesPublic/
-[Oo]bj/
-[Bb]in/
-[Ll]og/
-[Ll]ogs/
-[Ll]og[0-9]*
+bin/
+obj/
+artifacts/
+*.pdb
+*.dll
+*.exe
 
 # OS-specific files
 .DS_Store
@@ -17,12 +17,12 @@ Thumbs.db
 *.user
 *.suo
 *.userosscache
-*.suo
-*.sln.docstates
+.sln.docstates
 
 # Rider and Visual Studio Code folders
 .vscode/
 .idea/
+*.sln.iml
 
 # NuGet packages
 *.nupkg
@@ -31,27 +31,11 @@ Thumbs.db
 !**/packages/build/
 !**/packages/tools/
 
-# .NET Core specific files
-project.lock.json
-project.fragment.lock.json
-artifacts/
-
 # Local environment files
 .env
 
 # Dotnet tool directories
 .dotnet-tools/
-
-# Build outputs
-*.dll
-*.exe
-*.pdb
-*.cache
-*.log
-*.zip
-*.tar.gz
-*.tar
-*.7z
 
 # Coverage results
 coverage/
@@ -63,29 +47,29 @@ _ReSharper.*
 *.DotSettings.user
 *.DotSettings
 
-# Rider
-.idea/
-*.sln.iml
-
-# Mac
-*.DS_Store
-
-# Linux
-*.swp
-
-# Windows
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Visual Studio Code
-.vscode/
-
-# Global
+# Global log, temp, and backup files
 *.log
 *.tmp
 *.bak
 *.swp
 *.swo
 *.tmp
+
+# Ignore build outputs and compression artifacts
+*.cache
+*.zip
+*.tar.gz
+*.tar
+*.7z
+
+# Mac-specific files
+*.DS_Store
+
+# Linux-specific files
+*.swp
+
+# Windows-specific files
+*.cab
+*.msi
+*.msm
+*.msp
