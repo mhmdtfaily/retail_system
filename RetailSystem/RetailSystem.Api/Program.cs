@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using RetailSystem.Application.Interfaces;
 using RetailSystem.Infrastructure;
+using RetailSystem.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<RetailDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RetailDbConnection")));
 
+
+// Register the repository
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 
 var app = builder.Build();
 

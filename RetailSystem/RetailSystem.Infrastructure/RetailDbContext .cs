@@ -20,7 +20,6 @@ public class RetailDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Supplier>().HasIndex(s => new { s.Email, s.Phone }).IsUnique();
 
         // Seed SupplierStatus table
         modelBuilder.Entity<SupplierStatus>().HasData(
