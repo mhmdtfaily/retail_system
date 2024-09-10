@@ -24,7 +24,7 @@ public class RetailDbContext : DbContext
         // Seed SupplierStatus table
         modelBuilder.Entity<SupplierStatus>().HasData(
             new SupplierStatus { Id = Guid.NewGuid(), MachineName = "active", DisplayName = "Active" },
-            new SupplierStatus { Id = Guid.NewGuid(), MachineName = "inactive", DisplayName = "Inactive" }
+            new SupplierStatus { Id = Guid.NewGuid(), MachineName = "in_active", DisplayName = "Inactive" }
         );
 
         // Seed PurchaseOrderStatus table

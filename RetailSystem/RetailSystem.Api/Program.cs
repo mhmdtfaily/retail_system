@@ -19,6 +19,7 @@ builder.Services.AddDbContext<RetailDbContext>(options =>
 
 // Register the repository
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
 
 var app = builder.Build();
 

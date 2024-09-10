@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RetailSystem.Core.Entities;
 
@@ -6,6 +7,12 @@ public class PurchaseOrder
 {
     [Key]
     public Guid Id { get; set; }
+
+    [Required]
+    [ForeignKey("Supplier")]
+    public Guid SupplierId { get; set; }
+
+    public Supplier Supplier { get; set; }
 
     [Required]
     public DateTime OrderDate { get; set; }
