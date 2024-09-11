@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using RetailSystem.Api.Models;
 using RetailSystem.Application.Interfaces;
 using RetailSystem.Core;
-using RetailSystem.Core.Models;
+using RetailSystem.Core.RequestModel;
 using System;
 using System.Threading.Tasks;
 
@@ -20,7 +20,7 @@ namespace RetailSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateSupplier([FromBody] SupplierModel supplier)
+        public async Task<IActionResult> CreateSupplier([FromBody] CreateSupplierModel supplier)
         {
             if (!ModelState.IsValid)
             {
@@ -49,7 +49,7 @@ namespace RetailSystem.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateSupplier([FromBody] SupplierModel supplier)
+        public async Task<IActionResult> UpdateSupplier([FromBody] UpdateSupplierModel supplier)
         {
             if (!ModelState.IsValid)
             {

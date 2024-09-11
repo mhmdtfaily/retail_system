@@ -2,7 +2,7 @@
 using RetailSystem.Api.Models;
 using RetailSystem.Application.Interfaces;
 using RetailSystem.Core;
-using RetailSystem.Core.Models;
+using RetailSystem.Core.RequestModel;
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -18,11 +18,23 @@ namespace RetailSystem.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<ResponseApi<SupplierModel>> CreateSupplier(SupplierModel supplierModel)
+        public async Task<ResponseApi<SupplierModel>> CreateSupplier(CreateSupplierModel supplierModel)
         {
             var response = new ResponseApi<SupplierModel>();
             try
             {
+                // Fetch the status ID for the active state
+                var activeStatus = await _context.SupplierStatuses
+                                        .Where(s => s.MachineName == "active")
+                                        .FirstOrDefaultAsync();
+                if (activeStatus == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Supplier status not found.";
+                    response.StatusCode = 404;
+                    return response;
+                }
+
                 // Check for duplicate suppliers based on email or phone
                 var existingSupplier = await _context.Suppliers
                     .FirstOrDefaultAsync(s => s.Email == supplierModel.Email || s.Phone == supplierModel.Phone);
@@ -41,7 +53,7 @@ namespace RetailSystem.Infrastructure.Repositories
                     Address = supplierModel.Address,
                     Email = supplierModel.Email,
                     Phone = supplierModel.Phone,
-                    supplier_status_id = supplierModel.supplier_status_id
+                    supplier_status_id = activeStatus.Id
                 };
                 _context.Suppliers.Add(supplier);
                 await _context.SaveChangesAsync();
@@ -55,7 +67,6 @@ namespace RetailSystem.Infrastructure.Repositories
                         Address = supplier.Address,
                         Email = supplier.Email,
                         Phone = supplier.Phone,
-                        supplier_status_id = supplier.Status.Id // Assuming Status has an Id
                     };;
                 response.Message = "Supplier created successfully.";
                 response.StatusCode = 201;
@@ -92,8 +103,7 @@ namespace RetailSystem.Infrastructure.Repositories
                         Name = supplier.Name,
                         Address = supplier.Address,
                         Email = supplier.Email,
-                        Phone = supplier.Phone,
-                        supplier_status_id = supplier.Status.Id // Assuming Status has an Id
+                        Phone = supplier.Phone
                     };
                     response.IsSuccess = true;
                     response.StatusCode = 200;
@@ -107,25 +117,14 @@ namespace RetailSystem.Infrastructure.Repositories
             }
             return response;
         }
-        public async Task<ResponseApi<SupplierModel>> UpdateSupplier(SupplierModel supplierModel)
+        public async Task<ResponseApi<SupplierModel>> UpdateSupplier(UpdateSupplierModel updateSupplierModel)
         {
             var response = new ResponseApi<SupplierModel>();
 
             try
             {
-                //fetch the existing statuses
-                var existingSupplierStatus = await _context.SupplierStatuses.FindAsync(supplierModel.supplier_status_id);
-                if (existingSupplierStatus == null)
-                {
-                    return new ResponseApi<SupplierModel>
-                    {
-                        IsSuccess = false,
-                        Message = "Supplier Status not found.",
-                        StatusCode = 404
-                    };
-                }
                 // Fetch the existing supplier
-                var existingSupplier = await _context.Suppliers.FindAsync(supplierModel.Id);
+                var existingSupplier = await _context.Suppliers.FindAsync(updateSupplierModel.Id);
                 if (existingSupplier == null)
                 {
                     return new ResponseApi<SupplierModel>
@@ -137,11 +136,10 @@ namespace RetailSystem.Infrastructure.Repositories
                 }
 
                 // Update existing supplier's properties
-                existingSupplier.Name = supplierModel.Name;
-                existingSupplier.Address = supplierModel.Address;
-                existingSupplier.Email = supplierModel.Email;
-                existingSupplier.Phone = supplierModel.Phone;
-                existingSupplier.supplier_status_id = supplierModel.supplier_status_id;
+                existingSupplier.Name = updateSupplierModel.Name;
+                existingSupplier.Address = updateSupplierModel.Address;
+                existingSupplier.Email = updateSupplierModel.Email;
+                existingSupplier.Phone = updateSupplierModel.Phone;
 
                 // Save changes
                 await _context.SaveChangesAsync();
@@ -153,8 +151,7 @@ namespace RetailSystem.Infrastructure.Repositories
                     Name = existingSupplier.Name,
                     Address = existingSupplier.Address,
                     Email = existingSupplier.Email,
-                    Phone = existingSupplier.Phone,
-                    supplier_status_id = existingSupplier.supplier_status_id
+                    Phone = existingSupplier.Phone
                 };
 
                 response.IsSuccess = true;
@@ -241,7 +238,6 @@ namespace RetailSystem.Infrastructure.Repositories
                     Address = s.Address,
                     Email = s.Email,
                     Phone = s.Phone,
-                    supplier_status_id = s.supplier_status_id,
                     IsActive = (s.Status != null && s.Status.MachineName == "active")
                 }).ToList();
 

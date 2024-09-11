@@ -29,4 +29,5 @@ public class Supplier
     public Guid supplier_status_id { get; set; }
 
     public SupplierStatus Status { get; set; }
+
 }
