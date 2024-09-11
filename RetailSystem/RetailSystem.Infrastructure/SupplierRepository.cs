@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RetailSystem.Api.Models;
+using RetailSystem.Core.Models;
 using RetailSystem.Application.Interfaces;
 using RetailSystem.Core;
 using RetailSystem.Core.RequestModel;

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace RetailSystem.Api.Models;
+namespace RetailSystem.Core.Models;
     public class ResponseApi<T>
     {
         public ResponseApi()

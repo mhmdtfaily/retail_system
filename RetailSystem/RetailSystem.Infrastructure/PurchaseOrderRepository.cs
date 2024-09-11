@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RetailSystem.Application.Interfaces;
-using RetailSystem.Api.Models;
+using RetailSystem.Core.Models;
 using RetailSystem.Core.Entities;
 using System;
 using System.Collections.Generic;

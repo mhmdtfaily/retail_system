@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RetailSystem.Api.Models;
+using RetailSystem.Core.Models;
 using RetailSystem.Application.Interfaces;
 using RetailSystem.Core.RequestModel;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace RetailSystem.API.Controllers
 {
     [Route("api/[controller]")]
