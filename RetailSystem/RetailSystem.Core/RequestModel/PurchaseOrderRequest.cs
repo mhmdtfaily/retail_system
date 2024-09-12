@@ -10,27 +10,35 @@ namespace RetailSystem.Core.RequestModel;
     public class CreatePurchaseOrderRequest
     {
         public Guid SupplierId { get; set; }
-        public List<PurchaseOrderItemModel> OrderItems { get; set; }
+        public List<GetPurchaseOrderItemModel> OrderItems { get; set; }
     }
 
     public class PurchaseOrderItemModel
+    {
+        public Guid ItemId { get; set; }
+        public string ItemName { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
+    }
+    public class GetPurchaseOrderItemModel
     {
         public Guid ItemId { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
     }
 
-    public class PurchaseOrderModel
+public class PurchaseOrderModel
     {
         public Guid Id { get; set; }
         public Guid SupplierId { get; set; }
         public DateTime OrderDate { get; set; }
         public Guid PurchaseOrderStatusId { get; set; }
+        public List<PurchaseOrderItemModel> PurchaseOrderItems { get; set; }
         public decimal TotalAmount { get; set; }
     }
     public class ChangePurchaseOrderStatusRequest
     {
         public Guid PurchaseOrderId { get; set; }
-        public Guid PurchaseOrderStatusId { get; set; }
+        public string PurchaseOrderStatus { get; set; }
     }
 

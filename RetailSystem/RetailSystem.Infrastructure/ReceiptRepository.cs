@@ -33,6 +33,7 @@ namespace RetailSystem.Infrastructure.Repositories
                     // if receipt already exists, retrieve it and return the response
                     return await GetReceiptById(existingReceipt.Id);
                 }
+
                 var purchaseOrder = await _context.PurchaseOrders
                     .Include(p => p.PurchaseOrderItems)
                     .FirstOrDefaultAsync(p => p.Id == request.PurchaseOrderId);
@@ -86,9 +87,14 @@ namespace RetailSystem.Infrastructure.Repositories
                     ReceivedDate = request.ReceivedDate
                 };
 
+                var receiptItems = new List<ReceiptItemModelResponse>();
+                decimal totalAmount = 0;
+
                 foreach (var item in request.ReceiptItems)
                 {
-                    var purchaseOrderItem = await _context.PurchaseOrderItems.FindAsync(item.PurchaseOrderItemId);
+                    var purchaseOrderItem = await _context.PurchaseOrderItems
+                        .FirstOrDefaultAsync(poi => poi.Id == item.PurchaseOrderItemId);
+
                     if (purchaseOrderItem == null)
                     {
                         response.IsSuccess = false;
@@ -96,20 +102,34 @@ namespace RetailSystem.Infrastructure.Repositories
                         response.StatusCode = 400;
                         return response;
                     }
+
                     if (item.Quantity <= 0)
                     {
                         response.IsSuccess = false;
-                        response.Message = $"quantity must be greater than zero.";
+                        response.Message = $"Quantity must be greater than zero.";
                         response.StatusCode = 400;
                         return response;
                     }
-                    if (item.Quantity > purchaseOrderItem.Quantity) 
+
+                    if (item.Quantity > purchaseOrderItem.Quantity)
                     {
                         response.IsSuccess = false;
                         response.Message = $"Received quantity {item.Quantity} exceeds ordered quantity {purchaseOrderItem.Quantity} for item {purchaseOrderItem.Item.Name}.";
                         response.StatusCode = 400;
                         return response;
                     }
+
+                    // calculate the total amount for the receipt
+                    var price = purchaseOrderItem.Price;
+                    totalAmount += item.Quantity * price;
+
+                    // add receipt item details including price
+                    receiptItems.Add(new ReceiptItemModelResponse
+                    {
+                        PurchaseOrderItemId = item.PurchaseOrderItemId,
+                        Quantity = item.Quantity,
+                        Price = price
+                    });
 
                     var receiptItem = new ReceiptItem
                     {
@@ -121,15 +141,14 @@ namespace RetailSystem.Infrastructure.Repositories
 
                     _context.ReceiptItems.Add(receiptItem);
 
-                    // fetch the item entity to increae the quantity
+                    // fetch the item entity to update the quantity in inventory
                     var itemEntity = await _context.Items.FindAsync(purchaseOrderItem.ItemId);
                     if (itemEntity != null)
                     {
                         itemEntity.Quantity += item.Quantity;
                     }
 
-
-                    // update item ledger
+                    // update the item ledger
                     var itemLedger = new ItemLedger
                     {
                         Id = Guid.NewGuid(),
@@ -142,24 +161,17 @@ namespace RetailSystem.Infrastructure.Repositories
                 }
 
                 _context.Receipts.Add(receipt);
-
-
                 await _context.SaveChangesAsync();
 
+                // return the receipt response with prices and total amount
                 var receiptsResponse = new ReceiptModelResponse
                 {
                     Id = receipt.Id,
                     PurchaseOrderId = receipt.PurchaseOrderId,
                     ReceivedDate = receipt.ReceivedDate,
-                    ReceiptItems = receipt.ReceiptItems
-            .Select(ri => new ReceiptItemModel
-            {
-                PurchaseOrderItemId = ri.Id,
-                Quantity = ri.Quantity,
-                // Map other necessary properties here
-            }).ToList()
+                    ReceiptItems = receiptItems,
+                    TotalAmount = totalAmount
                 };
-
 
                 response.IsSuccess = true;
                 response.Message = "Receipt created successfully";
@@ -175,15 +187,16 @@ namespace RetailSystem.Infrastructure.Repositories
 
             return response;
         }
-
         public async Task<ResponseApi<ReceiptModelResponse>> GetReceiptById(Guid receiptId)
         {
             var response = new ResponseApi<ReceiptModelResponse>();
 
             try
             {
+                // fetch the receipt and related data
                 var receipt = await _context.Receipts
                     .Include(r => r.ReceiptItems)
+                        .ThenInclude(ri => ri.PurchaseOrderItem)
                     .FirstOrDefaultAsync(r => r.Id == receiptId);
 
                 if (receipt == null)
@@ -193,22 +206,30 @@ namespace RetailSystem.Infrastructure.Repositories
                     response.StatusCode = 404;
                     return response;
                 }
+
+                // create a list of ReceiptItemModelResponse, which includes the price
+                var receiptItems = receipt.ReceiptItems.Select(ri => new ReceiptItemModelResponse
                 {
-                    response.Data = new ReceiptModelResponse
-                    {
-                        Id = receipt.Id,
-                        PurchaseOrderId = receipt.PurchaseOrderId,
-                        ReceivedDate = receipt.ReceivedDate,
-                        ReceiptItems = receipt.ReceiptItems.Select(ri => new ReceiptItemModel
-                        {
-                            PurchaseOrderItemId = ri.PurchaseOrderItemId,
-                            Quantity = ri.Quantity
-                        }).ToList()
-                    };
-                    response.Message = "Receipt retrieved successfully";
-                    response.IsSuccess = true;
-                    response.StatusCode = 200;
-                }
+                    PurchaseOrderItemId = ri.PurchaseOrderItem.Id,
+                    Quantity = ri.Quantity,
+                    Price = ri.PurchaseOrderItem.Price
+                }).ToList();
+
+                // calculate the total amount
+                var totalAmount = receiptItems.Sum(ri => ri.Quantity * ri.Price);
+
+                // return the receipt data with item prices and total amount
+                response.Data = new ReceiptModelResponse
+                {
+                    Id = receipt.Id,
+                    PurchaseOrderId = receipt.PurchaseOrderId,
+                    ReceivedDate = receipt.ReceivedDate,
+                    ReceiptItems = receiptItems,
+                    TotalAmount = totalAmount
+                };
+                response.Message = "Receipt retrieved successfully";
+                response.IsSuccess = true;
+                response.StatusCode = 200;
             }
             catch (Exception ex)
             {
@@ -219,5 +240,7 @@ namespace RetailSystem.Infrastructure.Repositories
 
             return response;
         }
+
+
     }
 }

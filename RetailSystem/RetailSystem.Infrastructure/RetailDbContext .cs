@@ -33,7 +33,11 @@ public class RetailDbContext : DbContext
             new PurchaseOrderStatus { Id = Guid.NewGuid(), MachineName = "completed", DisplayName = "Completed" },
             new PurchaseOrderStatus { Id = Guid.NewGuid(), MachineName = "canceled", DisplayName = "Canceled" }
         );
-
+        modelBuilder.Entity<Receipt>()
+                    .HasMany(r => r.ReceiptItems)
+                    .WithOne(ri => ri.Receipt)
+                    .HasForeignKey(ri => ri.ReceiptId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
         base.OnModelCreating(modelBuilder);
 

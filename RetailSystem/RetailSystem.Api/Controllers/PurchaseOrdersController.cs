@@ -29,12 +29,8 @@ namespace RetailSystem.API.Controllers
             }
 
             var response = await _purchaseOrderRepository.CreatePurchaseOrder(request.SupplierId, request.OrderItems);
-            if (!response.IsSuccess)
-            {
-                return StatusCode(response.StatusCode, response);
-            }
 
-            return Ok(response);
+            return StatusCode(response.StatusCode, response);
         }
 
         [HttpGet("{id}")]
@@ -49,17 +45,12 @@ namespace RetailSystem.API.Controllers
             return Ok(response);
         }
 
-        [HttpPut("change-status")]
+        [HttpPut("ChangeStatus")]
         public async Task<IActionResult> ChangePurchaseOrderStatus([FromBody] ChangePurchaseOrderStatusRequest request)
         {
-            var response = await _purchaseOrderRepository.UpdatePurchaseOrderStatus(request.PurchaseOrderId, request.PurchaseOrderStatusId);
+            var response = await _purchaseOrderRepository.UpdatePurchaseOrderStatus(request.PurchaseOrderId, request.PurchaseOrderStatus);
 
-            if (!response.IsSuccess)
-            {
-                return StatusCode(response.StatusCode, response);
-            }
-
-            return Ok(response);
+            return StatusCode(response.StatusCode, response);
         }
     }
 }

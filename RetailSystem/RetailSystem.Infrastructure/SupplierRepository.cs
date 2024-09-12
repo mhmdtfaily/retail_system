@@ -43,7 +43,7 @@ namespace RetailSystem.Infrastructure.Repositories
                 {
                     response.IsSuccess = false;
                     response.Message = "A supplier with the same email or phone already exists.";
-                    response.StatusCode = 409; // Conflict
+                    response.StatusCode = 409;
                     return response;
                 }
                 // Map the created Supplier entity to SupplierModel
@@ -53,7 +53,8 @@ namespace RetailSystem.Infrastructure.Repositories
                     Address = supplierModel.Address,
                     Email = supplierModel.Email,
                     Phone = supplierModel.Phone,
-                    supplier_status_id = activeStatus.Id
+                    supplier_status_id = activeStatus.Id,
+                    Status=activeStatus
                 };
                 _context.Suppliers.Add(supplier);
                 await _context.SaveChangesAsync();
@@ -67,6 +68,8 @@ namespace RetailSystem.Infrastructure.Repositories
                         Address = supplier.Address,
                         Email = supplier.Email,
                         Phone = supplier.Phone,
+                        Status = supplier.Status,
+                        supplier_status_id=activeStatus.Id,
                     };;
                 response.Message = "Supplier created successfully.";
                 response.StatusCode = 201;
@@ -103,8 +106,11 @@ namespace RetailSystem.Infrastructure.Repositories
                         Name = supplier.Name,
                         Address = supplier.Address,
                         Email = supplier.Email,
-                        Phone = supplier.Phone
+                        Phone = supplier.Phone,
+                        Status = supplier.Status,
+                        supplier_status_id=supplier.supplier_status_id
                     };
+                    response.Message = "Supplier retrieved successfully";
                     response.IsSuccess = true;
                     response.StatusCode = 200;
                 }
@@ -123,8 +129,9 @@ namespace RetailSystem.Infrastructure.Repositories
 
             try
             {
-                // Fetch the existing supplier
+                // fetch the existing supplier
                 var existingSupplier = await _context.Suppliers.FindAsync(updateSupplierModel.Id);
+
                 if (existingSupplier == null)
                 {
                     return new ResponseApi<SupplierModel>
@@ -144,6 +151,17 @@ namespace RetailSystem.Infrastructure.Repositories
                 // Save changes
                 await _context.SaveChangesAsync();
 
+                var supplierStatus = await _context.SupplierStatuses
+                                                   .FirstOrDefaultAsync(s => s.Id == existingSupplier.supplier_status_id);
+
+                if (supplierStatus == null) 
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Supplier status not found.";
+                    response.StatusCode = 404;
+                    return response;
+                }
+
                 // Map the updated supplier to SupplierModel
                 var updatedSupplierModel = new SupplierModel
                 {
@@ -151,7 +169,9 @@ namespace RetailSystem.Infrastructure.Repositories
                     Name = existingSupplier.Name,
                     Address = existingSupplier.Address,
                     Email = existingSupplier.Email,
-                    Phone = existingSupplier.Phone
+                    Phone = existingSupplier.Phone,
+                    supplier_status_id=existingSupplier.Id,
+                    Status=supplierStatus
                 };
 
                 response.IsSuccess = true;
@@ -238,6 +258,8 @@ namespace RetailSystem.Infrastructure.Repositories
                     Address = s.Address,
                     Email = s.Email,
                     Phone = s.Phone,
+                    Status=s.Status,
+                    supplier_status_id=s.supplier_status_id,
                     IsActive = (s.Status != null && s.Status.MachineName == "active")
                 }).ToList();
 

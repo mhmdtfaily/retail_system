@@ -19,7 +19,7 @@ namespace RetailSystem.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<ResponseApi<PurchaseOrderModel>> CreatePurchaseOrder(Guid supplierId, List<PurchaseOrderItemModel> purchaseOrderitemList)
+        public async Task<ResponseApi<PurchaseOrderModel>> CreatePurchaseOrder(Guid supplierId, List<GetPurchaseOrderItemModel> purchaseOrderitemList)
         {
             var response = new ResponseApi<PurchaseOrderModel>();
             try
@@ -79,27 +79,25 @@ namespace RetailSystem.Infrastructure.Repositories
                 foreach (var item in purchaseOrderitemList)
                 {
                     var existingItem = await _context.Items.FindAsync(item.ItemId);
+
                     if (existingItem == null)
                     {
                         response.IsSuccess = false;
-                        response.Message = $"Item with name {existingItem.Name} not found.";
+                        response.Message = $"Item with id :{item.ItemId} not found.";
                         response.StatusCode = 404;
                         return response;
                     }
 
-                    if (existingItem.Quantity < item.Quantity)
+                    if (item.Quantity <= 0)
                     {
                         response.IsSuccess = false;
-                        response.Message = $"Insufficient quantity for item with name {existingItem.Name}.";
+                        response.Message = $"quantity must be greater than zero {existingItem.Name}.";
                         response.StatusCode = 400;
                         return response;
                     }
 
-                    // Decrease the item's quantity
-                    existingItem.Quantity -= item.Quantity;
-                    _context.Items.Update(existingItem);
 
-                    // Add PurchaseOrderItem
+                    // add PurchaseOrderItem
                     var purchaseOrderItem = new PurchaseOrderItem
                     {
                         Id = Guid.NewGuid(),
@@ -123,6 +121,12 @@ namespace RetailSystem.Infrastructure.Repositories
                     Id = purchaseOrder.Id,
                     SupplierId = purchaseOrder.SupplierId,
                     OrderDate = purchaseOrder.OrderDate,
+                    PurchaseOrderItems = purchaseOrder.PurchaseOrderItems.Select(
+                        poi => new PurchaseOrderItemModel
+                        {
+                            ItemId= poi.ItemId,ItemName=poi.Item.Name,
+                            Price=poi.Price,Quantity=poi.Quantity
+                        }).ToList(),
                     PurchaseOrderStatusId = purchaseOrder.PurchaseOrderStatusId,
                     TotalAmount = totalAmount
                 };
@@ -148,7 +152,7 @@ namespace RetailSystem.Infrastructure.Repositories
                 var purchaseOrder = await _context.PurchaseOrders
                     .Include(po => po.Supplier)
                     .Include(po => po.PurchaseOrderItems)
-                    .ThenInclude(poi => poi.Item)
+                        .ThenInclude(poi => poi.Item)
                     .Include(po => po.PurchaseOrderStatus)
                     .FirstOrDefaultAsync(po => po.Id == id);
 
@@ -166,8 +170,16 @@ namespace RetailSystem.Infrastructure.Repositories
                         SupplierId = purchaseOrder.SupplierId,
                         OrderDate = purchaseOrder.OrderDate,
                         PurchaseOrderStatusId = purchaseOrder.PurchaseOrderStatusId,
-                        TotalAmount = purchaseOrder.PurchaseOrderItems.Sum(poi => poi.Quantity * poi.Price)
+                        TotalAmount = purchaseOrder.PurchaseOrderItems.Sum(poi => poi.Quantity * poi.Price),
+                        PurchaseOrderItems = purchaseOrder.PurchaseOrderItems.Select(poi => new PurchaseOrderItemModel
+                        {
+                            ItemId = poi.ItemId,
+                            ItemName = poi.Item.Name,
+                            Quantity = poi.Quantity,
+                            Price = poi.Price,
+                        }).ToList()
                     };
+                    response.Message = "Purchase order retrieve successfully";
                     response.IsSuccess = true;
                     response.StatusCode = 200;
                 }
@@ -182,14 +194,15 @@ namespace RetailSystem.Infrastructure.Repositories
             return response;
         }
 
-        public async Task<ResponseApi<bool>> UpdatePurchaseOrderStatus(Guid purchaseOrderId, Guid purchaseOrderStatusId)
+        public async Task<ResponseApi<bool>> UpdatePurchaseOrderStatus(Guid purchaseOrderId, string purchaseOrderStatus)
         {
             var response = new ResponseApi<bool>();
             try
             {
                 // Check if the PurchaseOrderStatus exists
-                var statusExists = await _context.PurchaseOrderStatuses.AnyAsync(s => s.Id == purchaseOrderStatusId);
-                if (!statusExists)
+                var statusExists = await _context.PurchaseOrderStatuses.FirstOrDefaultAsync(s => s.MachineName == purchaseOrderStatus);
+
+                if (statusExists==null)
                 {
                     response.IsSuccess = false;
                     response.Message = "Invalid Purchase Order Status.";
@@ -208,7 +221,7 @@ namespace RetailSystem.Infrastructure.Repositories
                 }
 
                 // Update the status
-                purchaseOrder.PurchaseOrderStatusId = purchaseOrderStatusId;
+                purchaseOrder.PurchaseOrderStatusId = statusExists.Id;
                 _context.PurchaseOrders.Update(purchaseOrder);
                 await _context.SaveChangesAsync();
 
